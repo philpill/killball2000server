@@ -24,5 +24,6 @@ app.get('/players', players.getAll);
 app.get('/players/:id', players.getById);
 app.post('/players/:id/move', players.move);
 app.get('/games', games.getAll);
+app.get('/games/:id', games.getById);
 
 app.listen((process.env.OPENSHIFT_NODEJS_PORT || 8090), process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1');
