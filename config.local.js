@@ -1,5 +1,10 @@
 module.exports = {
 
+    grid : {
+
+        width   : 26,
+        height  : 15
+    },
     database : {
 
         url: 'localhost',

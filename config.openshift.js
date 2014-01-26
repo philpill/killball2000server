@@ -1,5 +1,10 @@
 module.exports = {
 
+    grid : {
+
+        width   : 26,
+        height  : 15
+    },
     database : {
 
         url: process.env.OPENSHIFT_MONGODB_DB_HOST,

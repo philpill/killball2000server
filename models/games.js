@@ -4,6 +4,8 @@ module.exports = mongoose.model('games', new mongoose.Schema({
 
     name : { type: String, required: true },
     home : {  },
-    away : {  }
+    away : {  },
+    turn : { type: Number, required: true },
+    currentTeam : { type: String, required: true }
 
 }));

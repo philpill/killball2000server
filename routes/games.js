@@ -18,6 +18,8 @@ exports.getById = function (req, res) {
 
         } else {
 
+            // new game!
+
             Team.find()
             .populate('players')
             .exec(function (err, data) {
@@ -26,7 +28,9 @@ exports.getById = function (req, res) {
 
                     "name" : "test",
                     "home" : data[0].toObject(),
-                    "away" : data[1].toObject()
+                    "away" : data[1].toObject(),
+                    "turn" : 0,
+                    "currentTeam" : data[0]._id
                 });
 
                 game.save(function (err, data) {
