@@ -18,6 +18,7 @@ exports.getById = function (req, res) {
         'player'    : player
     });
 };
+
 exports.move = function (req, res) {
     var playerId = req.params.id;
     var newX = req.body.x;
@@ -25,7 +26,7 @@ exports.move = function (req, res) {
     Game.findOne()
     .exec(function (err, data) {
         if (data) {
-            var team = (data.currentTeam === data.home._id) ? 'home' : 'away';
+            var team = (data.home._id.equals(data.currentTeam)) ? 'home' : 'away';
             var currentTeam = data[team];
             var oppositionTeam = data[team === 'home' ? 'away' : 'home'];
             var grid = utils.createBlankGrid();
@@ -38,12 +39,14 @@ exports.move = function (req, res) {
                 grid[position[0]][position[1]] = 'y';
             });
             var tackleZones = utils.getTackleZonesByTeam(oppositionTeam);
-            _.each(tackleZones, function(position){
-                var gridPosition = grid[position[0]][position[1]];
-                if (_.isNumber(gridPosition)) {
-                    grid[position[0]][position[1]]++;
-                }
-            });
+            console.log(tackleZones);
+            // _.each(tackleZones, function(position){
+            //     var gridPosition = grid[position[0]][position[1]];
+            //     console.log(position);
+            //     if (_.isNumber(gridPosition)) {
+            //         grid[position[0]][position[1]]++;
+            //     }
+            // });
             // console.log(grid[12]);
             // console.log(grid[13]);
             var originalX;

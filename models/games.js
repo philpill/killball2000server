@@ -6,6 +6,6 @@ module.exports = mongoose.model('games', new mongoose.Schema({
     home : {  },
     away : {  },
     turn : { type: Number, required: true },
-    currentTeam : { type: String, required: true }
+    currentTeam : {  }
 
 }));
