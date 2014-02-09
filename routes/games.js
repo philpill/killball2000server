@@ -16,9 +16,15 @@ function _update (id, update) {
     return dfd.promise;
 }
 
-var _updateGame = function (err, data) {
+function _updateGame (err, data) {
 
-    var update = { $inc: { turn: 1 }};
+    var update = { $inc: { turn: 1 }, currentTeam : {}};
+
+    update.currentTeam.isHome = data.currentTeam.isHome ? false : true;
+
+    var homeAway = update.currentTeam.isHome ? 'home' : 'away';
+
+    update.currentTeam.id = data[homeAway]._id;
 
     _update(data._id, update)
     .then(function (game) {
@@ -28,7 +34,7 @@ var _updateGame = function (err, data) {
     });
 };
 
-var _findGame = function (err, data) {
+function _findGame (err, data) {
     if (data) {
         _res.json(data);
     } else {
@@ -39,7 +45,7 @@ var _findGame = function (err, data) {
     }
 };
 
-var _findTeam = function (err, data) {
+function _findTeam (err, data) {
     var game = new Game({
         "name"  : "test",
         "home"  : data[0].toObject(),
@@ -53,14 +59,15 @@ var _findTeam = function (err, data) {
     game.save(_saveGame);
 };
 
-var _saveGame = function (err, data) {
+function _saveGame (err, data) {
     _res.json(data);
 };
 
-var games = {
-
+module.exports = {
     getAll : function (req, res) {
-        res.json([data]);
+        _req = req;
+        _res = res;
+        Game.find().exec(_findGame);
     },
     update : function (req, res) {
         _req = req;
@@ -73,5 +80,3 @@ var games = {
         Game.findOne().exec(_findGame);
     }
 }
-
-module.exports = games;
