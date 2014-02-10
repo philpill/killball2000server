@@ -7,10 +7,12 @@ module.exports = mongoose.model('players', new mongoose.Schema({
     //position          : { type: ObjectId, ref: 'Position' },
     position            : { type: String },
     starPlayerPoints    : { type: Number },
-    movement            : { type: Number },
-    strength            : { type: Number },
-    agility             : { type: Number },
-    armour              : { type: Number },
+    attributes          : {
+        movement            : { type: Number },
+        strength            : { type: Number },
+        agility             : { type: Number },
+        armour              : { type: Number }
+    },
     skills              : { type: Array },
     injuries            : { type: Array },
     isStarPlayer        : { type: Boolean },

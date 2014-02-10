@@ -12,9 +12,32 @@ var _req,
 function _updateGame (conditions, update) {
     var dfd = Q.defer();
     Game.update(conditions, update, function (err, numberAffected, raw) {
-        err ? dfd.reject() : dfd.resolve();
+        err ? dfd.reject(err) : dfd.resolve(raw);
     });
     return dfd.promise;
+}
+
+function _getPopulatedGrid (currentTeam, oppositionTeam) {
+
+    var grid = utils.createBlankGrid();
+    var currentTeamPositions = utils.getGridsFromTeam(currentTeam);
+    _.each(currentTeamPositions, function(position){
+        grid[position[0]][position[1]] = 'x';
+    });
+    var oppositionTeamPositions = utils.getGridsFromTeam(oppositionTeam);
+    _.each(oppositionTeamPositions, function(position){
+        grid[position[0]][position[1]] = 'y';
+    });
+    var tackleZones = utils.getTackleZonesByTeam(oppositionTeam);
+
+    _.each(tackleZones, function(position){
+        var gridPosition = grid[position[0]][position[1]];
+        if (_.isNumber(gridPosition)) {
+            grid[position[0]][position[1]]++;
+        }
+    });
+
+    return grid;
 }
 
 function _findGame (err, data) {
@@ -27,55 +50,47 @@ function _findGame (err, data) {
     var team = (data.home._id.equals(data.currentTeam.id)) ? 'home' : 'away';
     var currentTeam = data[team];
     var oppositionTeam = data[team === 'home' ? 'away' : 'home'];
-    var grid = utils.createBlankGrid();
-    var currentTeamPositions = utils.getGridsFromTeam(currentTeam);
-    _.each(currentTeamPositions, function(position){
-        grid[position[0]][position[1]] = 'x';
-    });
-    var oppositionTeamPositions = utils.getGridsFromTeam(oppositionTeam);
-    _.each(oppositionTeamPositions, function(position){
-        grid[position[0]][position[1]] = 'y';
-    });
-    var tackleZones = utils.getTackleZonesByTeam(oppositionTeam);
 
-    // _.each(tackleZones, function(position){
-    //     var gridPosition = grid[position[0]][position[1]];
-    //     console.log(position);
-    //     if (_.isNumber(gridPosition)) {
-    //         grid[position[0]][position[1]]++;
-    //     }
-    // });
-    // console.log(grid[12]);
-    // console.log(grid[13]);
+    var grid = _getPopulatedGrid(currentTeam, oppositionTeam);
+
     var originalX;
     var originalY;
     // are new grids adjacent?
     // does player has moves left?
-    _.each(currentTeam.players, function (player) {
-        if (player._id.toString() === playerId) {
-            originalX = player.x;
-            originalY = player.y;
-            player.x = newX;
-            player.y = newY;
-        }
-    });
+
+
+    var player = _.find(currentTeam.players, function(player){ return player._id.toString() === playerId; });
+
+    console.log(player);
+
+    if (!player.attributes.moved || player.attributes.moved < player.attributes.movement) {
+        originalX = player.x;
+        originalY = player.y;
+        player.x = newX;
+        player.y = newY;
+        player.attributes.moved = player.attributes.moved ? player.attributes.moved + 1 : 1;
+    }
+
     var conditions = { '_id' : data._id };
     var update = {};
     update[team] = data[team];
 
     _updateGame(conditions, update)
-    .then(function () {
+    .then(function (data) {
         var results = {};
         results[team] = {
             players : [{
                 '_id'       : playerId,
-                'x'         : parseInt(newX, 10),
-                'y'         : parseInt(newY, 10),
+                'x'         : parseInt(player.x, 10),
+                'y'         : parseInt(player.y, 10),
+                'attributes': {
+                    'moved' : parseInt(player.attributes.moved, 10)
+                },
                 'hasMoved'  : true
             }]
         };
         _res.json(results);
-    }, function () {
+    }, function (err) {
         _res.send(500, 'game update failed');
     });
 }

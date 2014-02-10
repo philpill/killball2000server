@@ -28,6 +28,7 @@ module.exports = {
             [x-1, y+0], [x+1, y+0],
             [x-1, y+1], [x, y+1], [x+1, y+1]
         ];
+        // console.log(grids);
         return grids;
     },
     getGridsFromTeams: function(teams) {
@@ -46,7 +47,8 @@ module.exports = {
     getTackleZonesByTeam: function (team) {
         var players = team.players;
         var tackleZones = _.map(players, function (player) {
-            return this.getAdjacentGridsMatrix(player.x, player.y);
+            // why are these x and y's sometimes strings?
+            return this.getAdjacentGridsMatrix(parseInt(player.x, 10), parseInt(player.y, 10));
         }, this);
         var result = _.flatten(tackleZones, true);
         result[0] = _.uniq(result[0]);
